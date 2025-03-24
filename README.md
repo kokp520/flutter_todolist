@@ -17,6 +17,9 @@
 - Flutter SDK（3.0.0+）
 - Dart SDK（2.17.0+）
 - iOS 11.0+ / Android 5.0+
+- Xcode (for iOS)
+- Apple Developer Account (for TestFlight)
+- Firebase <建立.env.local>
 
 ## 🚀 Go
 
@@ -36,13 +39,72 @@ cd flutter_todolist
 flutter pub get
 ```
 
-4. Start App：
+4. 建立.env.local：
+```bash
+cp .env.example .env.local
+```
+
+6. Start App：
 ```bash
 flutter run
 ```
 
-5. 其他：
+7. 其他：
 看Makefile
+
+## 📦 Build & Deploy
+
+### iOS TestFlight 發布流程
+
+1. 更新版本號（在 pubspec.yaml）：
+```yaml
+version: 1.0.0+1  # 格式是 version_name+build_number
+```
+
+2. 產生發布版本：
+```bash
+# 清理之前的建置
+flutter clean
+
+# 取得相依套件
+flutter pub get
+
+# 建置 iOS 發布版本
+flutter build ios --release
+
+# 或使用這個指令建置並自動遞增版本號
+flutter build ios --release --build-name=1.0.0 --build-number=1
+```
+
+3. 打開 Xcode 專案：
+```bash
+cd ios
+open Runner.xcworkspace
+```
+
+4. 在 Xcode 中：
+- 確認 Signing & Capabilities 設定正確
+- 選擇 Any iOS Device (arm64)
+- Product > Archive
+- 上傳到 App Store Connect
+
+5. 在 App Store Connect：
+- 前往 TestFlight 分頁
+- 等待處理完成
+- 新增測試人員和群組
+- 開始測試
+
+### 自動化腳本（選擇性）
+
+在 Makefile 加入：
+```makefile
+build-ios-testflight:
+    flutter clean
+    flutter pub get
+    flutter build ios --release
+    cd ios && xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release archive -archivePath build/Runner.xcarchive
+    cd ios && xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist exportOptions.plist -exportPath build/Runner.ipa
+```
 
 ## 📁 Project Structure
 

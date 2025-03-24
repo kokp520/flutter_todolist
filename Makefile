@@ -112,3 +112,11 @@ web-serve: web-build
 	@echo "正在啟動本地伺服器..."
 	cd build/web && python3 -m http.server 54135
 	@echo "請在瀏覽器中開啟 http://localhost:54135 查看網頁版本" 
+
+
+testflight:
+    flutter clean
+    flutter pub get
+    flutter build ios --release
+    cd ios && xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release archive -archivePath build/Runner.xcarchive
+    cd ios && xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist exportOptions.plist -exportPath build/Runner.ipa
